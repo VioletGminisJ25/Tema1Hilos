@@ -17,61 +17,67 @@ namespace Ejercicio4
         {
             cont = 0;
             finished = false;
-            Thread increm_thread = new Thread(Decrementar);
-            Thread decrem_thread = new Thread(Incrementar);
+            Thread decrem_thread = new Thread(() =>
+            {
+                while (!finished)
+                {
+                    lock (l)
+                    {
+                        if (!finished)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            cont--;
+                            Console.WriteLine($"{cont}");
+                            if (cont == -500)
+                            {
+
+                                finished = true;
+                                Monitor.Pulse(l);
+                            }
+                        }
+                    }
+                }
+            });
+            Thread increm_thread = new Thread(() =>
+            {
+                while (!finished)
+                {
+                    lock (l)
+                    {
+                        if (!finished)
+                        {
+
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            cont++;
+                            Console.WriteLine($"{cont}");
+                            if (cont == 500)
+                            {
+                                finished = true;
+                                Monitor.Pulse(l);
+
+                            }
+                        }
+                    }
+                }
+            });
             increm_thread.Start();
             decrem_thread.Start();
             lock (l)
             {
-
                 Monitor.Wait(l);
+                if (cont == -500)
+                {
+                    Console.WriteLine("Ganador el hilo rojo!");
+                }
+                else
+                {
+                    Console.WriteLine("Ganador el hilo azul!");
 
+                }
             }
+
             Console.ReadKey();
 
-        }
-        public static void Decrementar()
-        {
-            while (!finished)
-            {
-                lock (l)
-                {
-                    if (!finished)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        cont--;
-                        Console.WriteLine($"{cont}");
-                        if (cont == -500)
-                        {
-
-                            finished = true;
-                            Monitor.Pulse(l);
-                        }
-                    }
-                }
-            }
-        }
-        public static void Incrementar()
-        {
-            while (!finished)
-            {
-                lock (l)
-                {
-                    if (!finished)
-                    {
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        cont++;
-                        Console.WriteLine($"{cont}");
-                        if (cont == 500)
-                        {
-                            finished = true;
-                            Monitor.Pulse(l);
-
-                        }
-                    }
-                }
-            }
         }
     }
 }
