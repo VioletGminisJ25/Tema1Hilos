@@ -12,6 +12,7 @@ namespace Ejercicio4
     {
         static object l = new object();
         static int cont;
+        
         static bool finished;
         static void Main(string[] args)
         {
@@ -62,9 +63,9 @@ namespace Ejercicio4
             });
             increm_thread.Start();
             decrem_thread.Start();
+            increm_thread.Join();
             lock (l)
             {
-                Monitor.Wait(l);
                 if (cont == -500)
                 {
                     Console.WriteLine("Ganador el hilo rojo!");
